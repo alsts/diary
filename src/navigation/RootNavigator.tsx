@@ -4,6 +4,7 @@ import EntryDetailScreen from '../screens/EntryDetailScreen';
 import HomeScreen from '../screens/HomeScreen';
 import NewEntryScreen from '../screens/NewEntryScreen';
 import StatsScreen from '../screens/StatsScreen';
+import { theme } from '../styles/theme';
 
 export type RootStackParamList = {
 	Home: undefined;
@@ -20,12 +21,18 @@ const RootNavigator = () => {
 			initialRouteName="Home"
 			screenOptions={{
 				headerStyle: {
-					backgroundColor: '#f4511e',
+					backgroundColor: theme.colors.primary,
 				},
-				headerTintColor: '#fff',
+				headerTintColor: theme.colors.surface,
 				headerTitleStyle: {
-					fontWeight: 'bold',
+					fontWeight: '600',
+					fontSize: 18,
 				},
+				headerShadowVisible: false,
+				contentStyle: {
+					backgroundColor: theme.colors.background,
+				},
+				animation: 'slide_from_right',
 			}}
 		>
 			<Stack.Screen

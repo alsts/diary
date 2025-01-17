@@ -1,10 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ActivityIndicator, FAB, List, Searchbar } from 'react-native-paper';
+import { ActivityIndicator, Card, FAB, Searchbar, Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEntries } from '../redux/entriesSlice';
 import { RootState } from '../redux/store';
+import { theme } from '../styles/theme';
 
 const HomeScreen = () => {
 	const navigation = useNavigation();
@@ -25,7 +26,7 @@ const HomeScreen = () => {
 	if (loading) {
 		return (
 			<View style={styles.centered}>
-				<ActivityIndicator size="large" />
+				<ActivityIndicator size="large" color={theme.colors.primary} />
 			</View>
 		);
 	}
@@ -33,7 +34,7 @@ const HomeScreen = () => {
 	if (error) {
 		return (
 			<View style={styles.centered}>
-				<Text>Error: {error}</Text>
+				<Text variant="bodyLarge" style={{ color: theme.colors.error }}>{error}</Text>
 			</View>
 		);
 	}
@@ -45,24 +46,46 @@ const HomeScreen = () => {
 				onChangeText={setSearchQuery}
 				value={searchQuery}
 				style={styles.searchBar}
+				iconColor={theme.colors.primary}
+				elevation={theme.elevation.small}
 			/>
 
-			<List.Section>
-				{filteredEntries.map(entry => (
-					<List.Item
-						key={entry.id}
-						title={new Date(entry.date).toLocaleDateString()}
-						description={entry.content.substring(0, 50) + '...'}
-						left={props => <List.Icon {...props} icon="notebook" />}
-						onPress={() => navigation.navigate('EntryDetail', { entryId: entry.id })}
-					/>
-				))}
-			</List.Section>
+			{filteredEntries.length === 0 ? (
+				<View style={styles.emptyState}>
+					<Text variant="titleMedium" style={styles.emptyStateText}>
+						No entries found
+					</Text>
+				</View>
+			) : (
+				<View style={styles.entriesList}>
+					{filteredEntries.map(entry => (
+						<Card
+							key={entry.id}
+							style={styles.card}
+							onPress={() => navigation.navigate('EntryDetail', { entryId: entry.id })}
+						>
+							<Card.Content>
+								<Text variant="titleMedium" style={styles.date}>
+									{new Date(entry.date).toLocaleDateString()}
+								</Text>
+								<Text variant="bodyMedium" style={styles.preview}>
+									{entry.content.substring(0, 100)}
+									{entry.content.length > 100 ? '...' : ''}
+								</Text>
+								<Text variant="labelSmall" style={styles.category}>
+									{entry.category}
+								</Text>
+							</Card.Content>
+						</Card>
+					))}
+				</View>
+			)}
 
 			<FAB
-				style={styles.fab}
 				icon="plus"
+				style={styles.fab}
 				onPress={() => navigation.navigate('NewEntry')}
+				color={theme.colors.surface}
 			/>
 		</View>
 	);
@@ -71,7 +94,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: theme.colors.background,
 	},
 	centered: {
 		flex: 1,
@@ -79,13 +102,47 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	searchBar: {
-		margin: 16,
+		margin: theme.spacing.md,
+		borderRadius: theme.roundness,
+		backgroundColor: theme.colors.surface,
+	},
+	entriesList: {
+		padding: theme.spacing.md,
+	},
+	card: {
+		marginBottom: theme.spacing.md,
+		backgroundColor: theme.colors.surface,
+		borderRadius: theme.roundness,
+		elevation: theme.elevation.small,
+	},
+	date: {
+		color: theme.colors.primary,
+		marginBottom: theme.spacing.xs,
+	},
+	preview: {
+		color: theme.colors.text,
+		marginBottom: theme.spacing.sm,
+	},
+	category: {
+		color: theme.colors.secondary,
+		textTransform: 'uppercase',
+	},
+	emptyState: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: theme.spacing.xl,
+	},
+	emptyStateText: {
+		color: theme.colors.placeholder,
+		textAlign: 'center',
 	},
 	fab: {
 		position: 'absolute',
-		margin: 16,
+		margin: theme.spacing.md,
 		right: 0,
 		bottom: 0,
+		backgroundColor: theme.colors.primary,
 	},
 });
 
